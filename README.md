@@ -4,8 +4,8 @@ Una aplicación web para calcular el Índice de Masa Corporal, funciona de maner
 
 Características
 
-Autenticación y Registro
-Cálculo de IMC en tiempo real
-Historial de mediciones
-Dashboard para cada usuario
-Validaciones en los formularios
+-- Autenticación y Registro
+-- Cálculo de IMC en tiempo real
+-- Historial de mediciones
+-- Dashboard para cada usuario
+-- Validaciones en los formularios
