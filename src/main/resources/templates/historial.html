@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial - Calculadora IMC</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .card {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: none;
+            border-radius: 15px;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .table th {
+            border-top: none;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/home">
+                <i class="bi bi-calculator"></i> Calculadora IMC
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <a class="btn btn-outline-light btn-sm" href="/logout">
+                    <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex align-items-center">
+                    <a href="/home" class="btn btn-outline-primary me-3">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1><i class="bi bi-clock-history text-primary"></i> Historial de Mediciones</h1>
+                        <p class="text-white-50 mb-0">Revisa tu progreso y mediciones anteriores</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="row mb-4" th:if="${totalMediciones > 0}">
+            <div class="col-md-4 mb-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-calculator text-primary" style="font-size: 2rem;"></i>
+                        <h6 class="text-muted mt-2">Total de Mediciones</h6>
+                        <h3 th:text="${totalMediciones}">0</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3" th:if="${pesoActual}">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-speedometer2 text-primary" style="font-size: 2rem;"></i>
+                        <h6 class="text-muted mt-2">Peso Actual</h6>
+                        <h3 th:text="${pesoActual} + ' kg'">70 kg</h3>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3" th:if="${imcActual}">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-graph-up text-primary" style="font-size: 2rem;"></i>
+                        <h6 class="text-muted mt-2">IMC Actual</h6>
+                        <h3 th:text="${imcActual}">22.86</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de historial -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-table"></i> Historial Completo
+                            <span class="badge bg-primary ms-2" th:text="${totalMediciones} + ' mediciones'">0 mediciones</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${mediciones.empty}" class="text-center py-5">
+                            <i class="bi bi-clock-history text-muted" style="font-size: 4rem;"></i>
+                            <h4 class="mt-3 text-muted">No hay mediciones registradas</h4>
+                            <p class="text-muted mb-4">Comienza registrando tu primera medición para ver tu progreso aquí.</p>
+                            <a href="/nueva-medicion" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> Crear Primera Medición
+                            </a>
+                        </div>
+                        
+                        <div th:if="${!mediciones.empty}" class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th><i class="bi bi-calendar"></i> Fecha</th>
+                                        <th><i class="bi bi-speedometer2"></i> Peso (kg)</th>
+                                        <th><i class="bi bi-calculator"></i> IMC</th>
+                                        <th>Categoría</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="medicion : ${mediciones}">
+                                        <td th:text="${#temporals.format(medicion.fecha, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:30</td>
+                                        <td th:text="${medicion.peso}">70.0</td>
+                                        <td class="fw-bold" th:text="${medicion.imc}">22.86</td>
+                                        <td>
+                                            <span class="badge"
+                                                  th:classappend="${medicion.categoria == 'Peso normal'} ? 'bg-success' : 
+                                                                 (${medicion.categoria == 'Sobrepeso'} ? 'bg-warning' : 
+                                                                 (${medicion.categoria == 'Bajo peso'} ? 'bg-info' : 'bg-danger'))"
+                                                  th:text="${medicion.categoria}">Peso normal</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
